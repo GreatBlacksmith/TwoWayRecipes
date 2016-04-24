@@ -11,7 +11,8 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:weightSum="1">
         <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/list_item_image_view"
             android:paddingTop="5dp"
@@ -31,11 +32,13 @@
             android:textColor="#5d5d5d"
             android:gravity="center_vertical"
             android:layout_marginLeft="5dp"/>
+
     </LinearLayout>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="2px"
         android:background="@color/listborder"/>
+
 
 </LinearLayout>

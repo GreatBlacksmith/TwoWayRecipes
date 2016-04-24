@@ -7,11 +7,34 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+    android:focusableInTouchMode="true"
     tools:context="com.example.jim.twowayrecipes.RecepiesList">
+    <LinearLayout
+        android:orientation="horizontal"
+        android:id="@+id/searchlayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/searchList"
+            android:hint="@string/search_hint"
+            android:inputType="text"/>
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Search"
+            android:id="@+id/search_button"
+            android:layout_gravity="right"/>
+    </LinearLayout>
 
     <android.support.v7.widget.RecyclerView
+        android:layout_below="@+id/searchlayout"
         android:id="@+id/recycler_list_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="fill_parent" />
+
 
 </RelativeLayout>

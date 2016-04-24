@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">TwoWayRecipes</string>
     <string name="api_key">b950e649a339180dfb2e418990387651</string>
-
+    <string name="search_hint">By name or ingredients</string>
     <string name="title_activity_show_list">ShowListActivity</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>

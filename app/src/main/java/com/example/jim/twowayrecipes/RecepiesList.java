@@ -1,16 +1,22 @@
 package com.example.jim.twowayrecipes;
 
-import android.app.ListActivity;
+
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.app.Activity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.widget.ListAdapter;
-import android.widget.SimpleAdapter;
+import android.view.KeyEvent;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 
@@ -22,12 +28,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class RecepiesList extends AppCompatActivity {
+public class RecepiesList extends Activity {
 
     private List<Recipe> recipeList = new ArrayList<>();
     private RecyclerView recyclerView;
     private RecipesAdapter mAdapter;
-
+    private EditText searchText;
+    private Button searchButton;
+    private String searchTherm;
     //URL for the recepies
     private static String url = "http://food2fork.com/api/search";
 
@@ -49,9 +57,37 @@ public class RecepiesList extends AppCompatActivity {
         setContentView(R.layout.activity_recepies_list);
 
 
+        searchText = (EditText) findViewById(R.id.searchList);
+        searchButton = (Button) findViewById(R.id.search_button);
         recyclerView = (RecyclerView) findViewById(R.id.recycler_list_view);
 
         new GetRecipies().execute();
+        searchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                hideKeyboard(textView);
+                searchButton.requestFocus();
+                searchButton.performClick();
+                return true;
+            }
+        });
+
+
+
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                searchTherm = searchText.getText().toString();
+                hideKeyboard(view);
+                new GetRecipies().execute();
+            }
+        });
+    }
+    private void hideKeyboard(View view){
+        InputMethodManager inputManager = (InputMethodManager)
+                getSystemService(Context.INPUT_METHOD_SERVICE);
+
+        inputManager.hideSoftInputFromWindow((null == getCurrentFocus()) ? null : getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
     }
     private class GetRecipies extends AsyncTask<Void,Void,Void>{
 
@@ -74,8 +110,12 @@ public class RecepiesList extends AppCompatActivity {
             Request webreq = new Request();
             HashMap<String,String> params = new HashMap<String,String>();
             params.put("key", getResources().getString(R.string.api_key));
-            String jsonStr = webreq.makeWebServiceCall(url,params);
 
+
+            if(searchTherm != null){
+                params.put("q",searchTherm);
+            }
+            String jsonStr = webreq.makeWebServiceCall(url,params);
             Log.d("Response: ", "> " + jsonStr);
             recepiesList = ParseJSON(jsonStr);
             return null;

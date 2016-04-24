@@ -49,7 +49,7 @@ public class Request {
                     if(first) {
                         first = false;
                     }else {
-                        result.append("?");
+                        result.append("&");
                     }
                     result.append(URLEncoder.encode(entry.getKey(), "UTF-8"));
                     result.append("=");
