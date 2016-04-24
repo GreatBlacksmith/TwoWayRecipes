@@ -4,9 +4,15 @@ import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.widget.ListAdapter;
 import android.widget.SimpleAdapter;
+
+import com.facebook.drawee.backends.pipeline.Fresco;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -14,8 +20,13 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
-public class RecepiesList extends ListActivity {
+public class RecepiesList extends AppCompatActivity {
+
+    private List<Recipe> recipeList = new ArrayList<>();
+    private RecyclerView recyclerView;
+    private RecipesAdapter mAdapter;
 
     //URL for the recepies
     private static String url = "http://food2fork.com/api/search";
@@ -34,15 +45,18 @@ public class RecepiesList extends ListActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fresco.initialize(getApplicationContext());
         setContentView(R.layout.activity_recepies_list);
 
+
+        recyclerView = (RecyclerView) findViewById(R.id.recycler_list_view);
 
         new GetRecipies().execute();
     }
     private class GetRecipies extends AsyncTask<Void,Void,Void>{
 
         //Hashmap for the ListView
-        ArrayList<HashMap<String,String>> recepiesList;
+        ArrayList<Recipe> recepiesList;
         ProgressDialog pDialog;
 
         @Override
@@ -73,17 +87,18 @@ public class RecepiesList extends ListActivity {
                 pDialog.dismiss();
             }
 
-            ListAdapter adapter = new SimpleAdapter(RecepiesList.this, recepiesList, R.layout.list_item, new String[]{
-                    TAG_PUBLISHER, TAG_TITLE, TAG_SOURCE_URL}, new int[]{R.id.name, R.id.email, R.id.mobile});
-
-            setListAdapter(adapter);
+            mAdapter = new RecipesAdapter(recepiesList);
+            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+            recyclerView.setLayoutManager(mLayoutManager);
+            recyclerView.setItemAnimator(new DefaultItemAnimator());
+            recyclerView.setAdapter(mAdapter);
         }
         }
-    private ArrayList<HashMap<String,String>> ParseJSON(String json){
+    private ArrayList<Recipe> ParseJSON(String json){
         if(json != null){
             try{
                 //Hashmap za list view
-                ArrayList<HashMap<String,String>> recepiesList = new ArrayList<HashMap<String, String>>();
+                ArrayList<Recipe> recepiesList = new ArrayList<>();
                 JSONObject jsonObj = new JSONObject(json);
 
                 JSONArray recepies = jsonObj.getJSONArray("recipes");
@@ -92,16 +107,15 @@ public class RecepiesList extends ListActivity {
                     JSONObject c = recepies.getJSONObject(i);
 
                     String publisher = c.getString(TAG_PUBLISHER);
-                    String publisher_url = c.getString(TAG_PUBLISHER_URL);
+                    String image_url = c.getString(TAG_IMAGE_URL);
                     String title = c.getString(TAG_TITLE);
                     //TO_DO dodat ostale
 
-                    HashMap<String,String> recepie = new HashMap<String,String>();
-                    recepie.put(TAG_PUBLISHER,publisher);
-                    recepie.put(TAG_PUBLISHER_URL,publisher_url);
-                    recepie.put(TAG_TITLE,title);
+                    Recipe rec = new Recipe();
+                    rec.setTitle(title);
+                    rec.setImage_url(image_url);
 
-                    recepiesList.add(recepie);
+                    recepiesList.add(rec);
 
                 }
                 return recepiesList;
