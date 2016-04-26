@@ -1,5 +1,8 @@
 package com.example.jim.twowayrecipes;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 public class Recipe {
 
     private String title;
@@ -8,23 +11,33 @@ public class Recipe {
     private String image_url;
     private String source_url;
     private String f2f_url;
-    private long social_rank;
+    private String recipe_id;
+    private BigDecimal social_rank;
     private String ingredients;
 
     public Recipe() {
     }
 
     public Recipe(String title, String publisher, String publisher_url,
-                  String image_url, String source_url, String f2f_url,
-                  long social_rank, String ingredients) {
+                  String image_url, String source_url, String f2f_url,String recipe_id,
+                  BigDecimal social_rank, String ingredients) {
         this.title = title;
         this.publisher = publisher;
         this.publisher_url = publisher_url;
         this.image_url = image_url;
         this.source_url = source_url;
         this.f2f_url = f2f_url;
+        this.recipe_id = recipe_id;
         this.social_rank = social_rank;
         this.ingredients = ingredients;
+    }
+
+    public String getRecipeId() {
+        return recipe_id;
+    }
+
+    public void setRecipeId(String recipeId) {
+        this.recipe_id = recipeId;
     }
 
     public String getTitle() {
@@ -75,11 +88,11 @@ public class Recipe {
         this.f2f_url = f2f_url;
     }
 
-    public long getSocial_rank() {
+    public BigDecimal getSocial_rank() {
         return social_rank;
     }
 
-    public void setSocial_rank(long social_rank) {
+    public void setSocial_rank(BigDecimal social_rank) {
         this.social_rank = social_rank;
     }
 

@@ -3,6 +3,7 @@ package com.example.jim.twowayrecipes;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
@@ -16,6 +17,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.facebook.drawee.backends.pipeline.Fresco;
@@ -26,29 +28,25 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RecepiesList extends Activity {
 
-    private List<Recipe> recipeList = new ArrayList<>();
+    private List<Recipe> list;
     private RecyclerView recyclerView;
     private RecipesAdapter mAdapter;
     private EditText searchText;
-    private Button searchButton;
     private String searchTherm;
-    //URL for the recepies
-    private static String url = "http://food2fork.com/api/search";
+    ProgressDialog pDialog;
+    HashMap<String,String> params;
 
-    //Tags for Json
-    private static final String TAG_PUBLISHER = "publisher";
-    private static final String TAG_IMAGE_URL = "image_url";
-    private static final String TAG_SOURCE_URL = "source_url";
-    private static final String TAG_F2F_URL = "f2f_url";
-    private static final String TAG_TITLE = "title";
-    private static final String TAG_PUBLISHER_URL = "publisher_url";
-    private static final String TAG_SOCIAL_RANK = "social_rank";
-    private static final String TAG_INGREDIENTS = "ingredients";
-    private static final String TAG_COUNT = "count";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,30 +54,20 @@ public class RecepiesList extends Activity {
         Fresco.initialize(getApplicationContext());
         setContentView(R.layout.activity_recepies_list);
 
-
         searchText = (EditText) findViewById(R.id.searchList);
-        searchButton = (Button) findViewById(R.id.search_button);
         recyclerView = (RecyclerView) findViewById(R.id.recycler_list_view);
 
-        new GetRecipies().execute();
+        this.doServerCall();
         searchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
                 hideKeyboard(textView);
-                searchButton.requestFocus();
-                searchButton.performClick();
-                return true;
-            }
-        });
-
-
-
-        searchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
                 searchTherm = searchText.getText().toString();
-                hideKeyboard(view);
-                new GetRecipies().execute();
+                if(searchTherm != null){
+                    params.put("q",searchTherm);
+                }
+                doServerCall();
+                return true;
             }
         });
     }
@@ -89,83 +77,54 @@ public class RecepiesList extends Activity {
 
         inputManager.hideSoftInputFromWindow((null == getCurrentFocus()) ? null : getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
     }
-    private class GetRecipies extends AsyncTask<Void,Void,Void>{
 
-        //Hashmap for the ListView
-        ArrayList<Recipe> recepiesList;
-        ProgressDialog pDialog;
+    private void doServerCall(){
 
-        @Override
-        protected void onPreExecute(){
-            super.onPreExecute();
-
-            pDialog = new ProgressDialog(RecepiesList.this);
+        pDialog = new ProgressDialog(RecepiesList.this);
             pDialog.setMessage("Loading recepies..");
             pDialog.setCancelable(false);
             pDialog.show();
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(getResources().getString(R.string.api_url))
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        RecipeDetailsInterface recipeInterface = retrofit.create(RecipeDetailsInterface.class);
+        params =  new LinkedHashMap<String,String>();
+        params.put("key", getResources().getString(R.string.api_key));
+        if(searchTherm != null){
+            params.put("q",searchTherm);
         }
-
-        @Override
-        protected Void doInBackground(Void... arg0){
-            Request webreq = new Request();
-            HashMap<String,String> params = new HashMap<String,String>();
-            params.put("key", getResources().getString(R.string.api_key));
-
-
-            if(searchTherm != null){
-                params.put("q",searchTherm);
-            }
-            String jsonStr = webreq.makeWebServiceCall(url,params);
-            Log.d("Response: ", "> " + jsonStr);
-            recepiesList = ParseJSON(jsonStr);
-            return null;
-        }
-        @Override
-        protected void onPostExecute(Void result) {
-
-            if (pDialog.isShowing()) {
+        Call<RecipeList> call = recipeInterface.getRecipeList(params);
+        call.enqueue(new Callback<RecipeList>() {
+            @Override
+            public void onResponse(Call<RecipeList> call, Response<RecipeList> response) {
+                if (pDialog.isShowing()) {
                 pDialog.dismiss();
             }
-
-            mAdapter = new RecipesAdapter(recepiesList);
-            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-            recyclerView.setLayoutManager(mLayoutManager);
-            recyclerView.setItemAnimator(new DefaultItemAnimator());
-            recyclerView.setAdapter(mAdapter);
-        }
-        }
-    private ArrayList<Recipe> ParseJSON(String json){
-        if(json != null){
-            try{
-                //Hashmap za list view
-                ArrayList<Recipe> recepiesList = new ArrayList<>();
-                JSONObject jsonObj = new JSONObject(json);
-
-                JSONArray recepies = jsonObj.getJSONArray("recipes");
-
-                for(int i = 0; i<recepies.length(); i++){
-                    JSONObject c = recepies.getJSONObject(i);
-
-                    String publisher = c.getString(TAG_PUBLISHER);
-                    String image_url = c.getString(TAG_IMAGE_URL);
-                    String title = c.getString(TAG_TITLE);
-                    //TO_DO dodat ostale
-
-                    Recipe rec = new Recipe();
-                    rec.setTitle(title);
-                    rec.setImage_url(image_url);
-
-                    recepiesList.add(rec);
-
+                list =  new ArrayList<Recipe>();
+                if(response.isSuccessful()){
+                    RecipeList recipeList = response.body();
+                    for(Recipe rec : recipeList.getRecipes()){
+                        list.add(rec);
+                    }
+                    mAdapter = new RecipesAdapter(list);
+                    mAdapter.notifyDataSetChanged();
+                    RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+                    recyclerView.setLayoutManager(mLayoutManager);
+                    recyclerView.setItemAnimator(new DefaultItemAnimator());
+                    recyclerView.setAdapter(mAdapter);
+                    mAdapter.notifyDataSetChanged();
                 }
-                return recepiesList;
-            }catch(JSONException e){
-                e.printStackTrace();
-                return null;
             }
-        }else{
-            Log.e("ServiceHandler","Coudn't get that from the url");
-            return null;
-        }
+
+            @Override
+            public void onFailure(Call<RecipeList> call, Throwable t) {
+                if (pDialog.isShowing()) {
+                    pDialog.dismiss();
+            }
+                Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }

@@ -16,18 +16,11 @@
         android:layout_height="wrap_content">
 
         <EditText
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/searchList"
             android:hint="@string/search_hint"
             android:inputType="text"/>
-        <Button
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Search"
-            android:id="@+id/search_button"
-            android:layout_gravity="right"/>
     </LinearLayout>
 
     <android.support.v7.widget.RecyclerView

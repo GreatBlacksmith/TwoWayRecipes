@@ -31,6 +31,7 @@ public class Request {
         URL url;
         response = "";
         try{
+            urladdress = urladdress + "/search";
             url = new URL(urladdress);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
