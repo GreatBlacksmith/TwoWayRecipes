@@ -35,7 +35,6 @@ public class RecipeDetailsActivity extends Activity {
         this.scoreBar = (RatingBar)findViewById(R.id.ratingBarRecepie);
         this.authorTextView = (TextView)findViewById(R.id.textViewAuthor);
         this.imageView = (SimpleDraweeView) findViewById(R.id.recipeDetailsImageView);
-        scoreBar.setNumStars(5);
         Intent intent = getIntent();
         String recipeId = intent.getStringExtra("recipeId");
 
@@ -60,7 +59,8 @@ public class RecipeDetailsActivity extends Activity {
                     for( int i=0; i< recipeDetailsAnswer.getRecipe().getIngredients().size();i++){
                         ingredients.append("-" + recipeDetailsAnswer.getRecipe().getIngredients().get(i) + "\n");
                     }
-                    scoreBar.setProgress(recipeDetailsAnswer.getRecipe().getSocialRank().intValue()/20);
+                    scoreBar.setProgress(recipeDetailsAnswer.getRecipe().getSocialRank().intValue());
+                    scoreBar.setFocusable(false);
                     authorTextView.setText(recipeDetailsAnswer.getRecipe().getPublisher());
                     Uri uri = Uri.parse(recipeDetailsAnswer.getRecipe().getImageUrl());
                     imageView.setImageURI(uri);

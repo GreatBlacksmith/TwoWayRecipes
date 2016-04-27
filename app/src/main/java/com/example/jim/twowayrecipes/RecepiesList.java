@@ -51,7 +51,6 @@ public class RecepiesList extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Fresco.initialize(getApplicationContext());
         setContentView(R.layout.activity_recepies_list);
 
         searchText = (EditText) findViewById(R.id.searchList);

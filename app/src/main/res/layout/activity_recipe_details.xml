@@ -20,23 +20,23 @@
 
         <com.facebook.drawee.view.SimpleDraweeView
             android:layout_width="match_parent"
-            android:layout_height="300dp"
+            android:layout_height="250dp"
             android:id="@+id/recipeDetailsImageView" />
         <TextView
             android:textAppearance="@android:style/TextAppearance.Large"
             android:id="@+id/titleImageViewText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
             android:layout_alignParentTop="true"
-            android:layout_marginTop="20dp"
             android:layout_centerHorizontal="true"
-            android:text="Test"
+            android:background="@drawable/green_box"
+            android:textColor="@color/textWhite"
             android:gravity="center"
         />
     </RelativeLayout>
 
     <LinearLayout
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/linearLayoutImage"
@@ -44,46 +44,90 @@
         android:layout_alignParentStart="true"
         android:id="@+id/linearLayoutIngridents">
 
-        <ScrollView
-            android:layout_width="1dp"
-            android:id="@+id/ScrollViewIngridients"
-            android:layout_weight="0.7"
-            android:layout_height="match_parent"
-            android:background="@drawable/box_za_sastojke">
-
-            <TextView
-                android:textColor="@color/textWhite"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/textViewIngridients"/>
-
-        </ScrollView>
-
         <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="100dp"
-            android:layout_weight="0.3"
-            android:layout_height="match_parent"
-            android:layout_alignRight="@+id/ScrollViewIngridients"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="0px"
+            android:layout_weight="3"
             android:weightSum="1">
 
-            <RatingBar
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/ratingBarRecepie" />
-
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="Medium Text"
+                android:padding="5dp"
+                android:gravity="center"
+                android:layout_gravity="center_vertical"
                 android:id="@+id/textViewAuthor"
-                android:layout_weight="0.4" />
+                android:layout_weight="0.90" />
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="right">
+            <RatingBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/ratingBarRecepie"
+                android:numStars="5"
+                android:stepSize="0.05"
+                android:isIndicator="true"
+                android:layout_gravity="center_vertical"
+                style="?android:attr/ratingBarStyleSmall"
+                 />
+            </LinearLayout>
+        </LinearLayout>
+            <ScrollView
+                android:layout_width="match_parent"
+                android:id="@+id/ScrollViewIngridients"
+                android:layout_height="0px"
+                android:background="@drawable/box_za_sastojke"
+                android:layout_weight="10"
+                android:padding="7dp">
 
+                <TextView
+                    android:textColor="@color/textWhite"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/textViewIngridients" />
+
+            </ScrollView>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="0px"
+            android:layout_weight="4"
+            android:paddingTop="6dp">
+
+            <ImageButton
+                android:layout_width="0px"
+                android:layout_height="match_parent"
+                android:id="@+id/imageButton"
+                android:layout_gravity="start"
+                android:layout_weight="1"
+                android:layout_marginTop="6dp"
+                android:layout_marginRight="6dp"
+                android:layout_marginBottom="6dp"
+                android:background="@drawable/green_button"/>
+
+            <ImageButton
+                android:layout_width="0px"
+                android:layout_height="match_parent"
+                android:id="@+id/imageButton2"
+                android:layout_gravity="end"
+                android:layout_marginTop="6dp"
+                android:layout_marginLeft="6dp"
+                android:layout_marginBottom="6dp"
+                android:layout_weight="1"
+                android:background="@drawable/green_button"/>
         </LinearLayout>
 
-
-
     </LinearLayout>
+
+
+
+
+
 
 </RelativeLayout>
