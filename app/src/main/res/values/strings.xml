@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">2WayRecipes</string>
     <string name="api_key">b950e649a339180dfb2e418990387651</string>
-    <string name="search_hint">pasta..pizza..coffee..breakfast</string>
+    <string name="search_hint">Click to search: pasta..breakfast..pizza</string>
     <string name="title_activity_show_list">ShowListActivity</string>
     <string name="api_url">http://food2fork.com/api/</string>
     <string name="ingredients_dropdown_placeholder">Click to select ingredients</string>
@@ -9,11 +9,30 @@
     <string name="full_recipe">Full recipe</string>
     <string name="load_button">Load More</string>
     <string-array name="ingredients_array">
-        <item>Chicken</item>
-        <item>Potato</item>
-        <item>Onion</item>
-        <item>Corn</item>
+        <item>Artichoke</item>
+        <item>Avocado</item>
+        <item>Bacon</item>
+        <item>Bean</item>
         <item>Beef</item>
+        <item>Carrot</item>
+        <item>Celery</item>
+        <item>Cheese</item>
+        <item>Chicken</item>
+        <item>Chili</item>
+        <item>Chocolate</item>
+        <item>Corn</item>
+        <item>Egg</item>
+        <item>Fish</item>
+        <item>Garlic</item>
+        <item>Jalapeno</item>
+        <item>Nuts</item>
+        <item>Onion</item>
+        <item>Paprika</item>
+        <item>Pork</item>
+        <item>Potato</item>
+        <item>Spinach</item>
+        <item>Tomato</item>
+        <item>Turkey</item>
     </string-array>
 
 </resources>

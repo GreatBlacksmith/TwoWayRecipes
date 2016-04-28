@@ -10,7 +10,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.Light.NoTitleBar">
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity" android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -18,8 +18,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".RecepiesList" />
-        <activity android:name=".RecipeDetailsActivity" />
-        <activity android:name=".RecipeListCheckboxActivity"></activity>
+        <activity android:name=".RecipeDetailsActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".RecipeListCheckboxActivity"/>
     </application>
 
 </manifest>

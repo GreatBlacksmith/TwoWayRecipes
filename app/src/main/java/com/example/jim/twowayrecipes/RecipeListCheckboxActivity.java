@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -34,9 +35,16 @@ public class RecipeListCheckboxActivity extends Activity {
     private List<Recipe> listRecipe;
     private RecyclerView recyclerView;
     private RecipesAdapter mAdapter;
+    private int currPage;
+    private boolean previousCallEmpty = false;
     StringBuilder stringBuilder;
+    StringBuilder oldStringBuilder;
     ProgressDialog pDialog;
     HashMap<String,String> params;
+    private boolean loading = true;
+    private Parcelable recyclerViewState = null;
+    int pastVisiblesItems, visibleItemCount, totalItemCount;
+    private RecyclerView.LayoutManager layoutManagerRef;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,7 +55,7 @@ public class RecipeListCheckboxActivity extends Activity {
 
             list.add(ingredients[i]);
         }
-
+        currPage = 1;
         View openDialog = (View) findViewById(R.id.checkbox_layout);
         openDialog.setOnClickListener(new View.OnClickListener() {
 
@@ -96,6 +104,8 @@ public class RecipeListCheckboxActivity extends Activity {
                                     stringBuilder.setLength(0);
 
                                 } else {
+                                    currPage = 1;
+                                    previousCallEmpty = false;
                                     doServerCall();
 
                                 }
@@ -106,11 +116,36 @@ public class RecipeListCheckboxActivity extends Activity {
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                ((TextView) findViewById(R.id.text)).setText("Click here to open Dialog");
+                                ((TextView) findViewById(R.id.text)).setText(getResources().getString(R.string.ingredients_dropdown_placeholder));
                             }
                         });
                 AlertDialog alert = builderDialog.create();
                 alert.show();
+            }
+        });
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                if (dy > 0) //check for scroll down
+                {
+                    visibleItemCount = layoutManagerRef.getChildCount();
+                    totalItemCount = layoutManagerRef.getItemCount();
+                    pastVisiblesItems = ((LinearLayoutManager) recyclerView.getLayoutManager()).findFirstVisibleItemPosition();
+
+                    if (loading) {
+                        if ((visibleItemCount + pastVisiblesItems) >= totalItemCount) {
+                            loading = false;
+
+                            recyclerViewState = recyclerView.getLayoutManager().onSaveInstanceState();
+                            if(!previousCallEmpty) {
+                                doServerCall();
+                            }
+
+                        }
+                    }
+                }
             }
         });
     }
@@ -131,6 +166,15 @@ public class RecipeListCheckboxActivity extends Activity {
         if(stringBuilder != null){
             params.put("q",stringBuilder.toString());
         }
+        if(stringBuilder != oldStringBuilder){
+            previousCallEmpty = false;
+            oldStringBuilder = stringBuilder;
+            listRecipe = new ArrayList<>();
+        }
+        if(currPage !=1){
+            params.put("page",String.valueOf(currPage));
+        }
+        currPage++;
         Call<RecipeList> call = recipeInterface.getRecipeList(params);
         call.enqueue(new Callback<RecipeList>() {
             @Override
@@ -138,19 +182,30 @@ public class RecipeListCheckboxActivity extends Activity {
                 if (pDialog.isShowing()) {
                     pDialog.dismiss();
                 }
-                listRecipe = new ArrayList<Recipe>();
                 if (response.isSuccessful()) {
-                    RecipeList recipeList = response.body();
-                    for (Recipe rec : recipeList.getRecipes()) {
-                        listRecipe.add(rec);
+                    if (response.body().getCount() == 0){
+                        previousCallEmpty = true;
                     }
-                    mAdapter = new RecipesAdapter(listRecipe);
-                    mAdapter.notifyDataSetChanged();
-                    RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-                    recyclerView.setLayoutManager(mLayoutManager);
-                    recyclerView.setItemAnimator(new DefaultItemAnimator());
-                    recyclerView.setAdapter(mAdapter);
-                    mAdapter.notifyDataSetChanged();
+                    if (response.body().getCount() == 0 && currPage == 2) {
+                        Toast.makeText(getApplicationContext(), "Can't find recipe matching criteria :)", Toast.LENGTH_SHORT).show();
+                    } else {
+                        RecipeList recipeList = response.body();
+                        for (Recipe rec : recipeList.getRecipes()) {
+                            listRecipe.add(rec);
+                        }
+                        mAdapter = new RecipesAdapter(listRecipe);
+                        mAdapter.notifyDataSetChanged();
+                        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+                        layoutManagerRef = mLayoutManager;
+                        recyclerView.setLayoutManager(mLayoutManager);
+                        recyclerView.setItemAnimator(new DefaultItemAnimator());
+                        recyclerView.setAdapter(mAdapter);
+                        if (recyclerViewState != null && currPage != 2) {
+                            recyclerView.getLayoutManager().onRestoreInstanceState(recyclerViewState);
+                        }
+                        loading = true;
+                        //    mAdapter.notifyDataSetChanged();
+                    }
                 }
             }
 

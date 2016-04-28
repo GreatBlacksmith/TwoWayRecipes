@@ -4,6 +4,7 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="textWhite">#ffffff</color>
-    <color name="listborder">#e4e2d7</color>
+    <color name="listborder">#6b6961</color>
+    <color name="textGray">#616161</color>
     <color name="black_overlay">#66000000</color>
 </resources>

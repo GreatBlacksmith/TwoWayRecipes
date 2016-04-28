@@ -24,6 +24,7 @@
             android:id="@+id/recipeDetailsImageView" />
         <TextView
             android:textAppearance="@android:style/TextAppearance.Large"
+            android:textSize="16sp"
             android:id="@+id/titleImageViewText"
             android:layout_width="match_parent"
             android:layout_height="40dp"
@@ -90,7 +91,8 @@
                     android:textColor="@color/textWhite"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/textViewIngridients" />
+                    android:id="@+id/textViewIngridients"
+                    android:textSize="16sp"/>
 
             </ScrollView>
         <LinearLayout
@@ -103,7 +105,7 @@
             <Button
                 android:layout_width="0px"
                 android:layout_height="match_parent"
-                android:id="@+id/imageButton"
+                android:id="@+id/imageButtonAuthor"
                 android:layout_gravity="start"
                 android:layout_weight="1"
                 android:layout_marginTop="6dp"
@@ -117,7 +119,7 @@
             <Button
                 android:layout_width="0px"
                 android:layout_height="match_parent"
-                android:id="@+id/imageButton2"
+                android:id="@+id/imageButtonFullRecipe"
                 android:layout_gravity="end"
                 android:layout_marginTop="6dp"
                 android:layout_marginLeft="6dp"

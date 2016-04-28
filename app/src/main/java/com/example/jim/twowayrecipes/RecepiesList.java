@@ -36,11 +36,13 @@ public class RecepiesList extends Activity {
     private RecipesAdapter mAdapter;
     private EditText searchText;
     private String searchTherm;
+    private String oldSearchTherm;
     private int currPage = 1;
     ProgressDialog pDialog;
     HashMap<String,String> params;
     private int loaded = 0;
     private boolean loading = true;
+    private boolean previousCallEmpty = false;
     private Parcelable recyclerViewState = null;
     int pastVisiblesItems, visibleItemCount, totalItemCount;
     private RecyclerView.LayoutManager layoutManagerRef;
@@ -50,7 +52,8 @@ public class RecepiesList extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recepies_list);
         listOfRecipes = new ArrayList<>();
-        searchText = (EditText) findViewById(R.id.searchList);
+        searchText = (EditText) findViewById(R.id.searchList);;
+        searchTherm = searchText.getText().toString();
         recyclerView = (RecyclerView) findViewById(R.id.recycler_list_view);
 
         this.doServerCall();
@@ -59,9 +62,11 @@ public class RecepiesList extends Activity {
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
                 hideKeyboard(textView);
                 searchTherm = searchText.getText().toString();
+
                 if (searchTherm != null) {
-                    params.put("q", searchTherm);
+                    currPage = 1;
                 }
+                previousCallEmpty = false;
                 doServerCall();
                 return true;
             }
@@ -83,7 +88,9 @@ public class RecepiesList extends Activity {
                             loading = false;
 
                             recyclerViewState = recyclerView.getLayoutManager().onSaveInstanceState();
-                            doServerCall();
+                            if(!previousCallEmpty) {
+                                doServerCall();
+                            }
 
                         }
                     }
@@ -117,6 +124,11 @@ public class RecepiesList extends Activity {
         if(searchTherm != null){
             params.put("q",searchTherm);
         }
+        if(searchTherm != oldSearchTherm){
+            previousCallEmpty = false;
+            oldSearchTherm = searchTherm;
+            listOfRecipes = new ArrayList<>();
+        }
         if(currPage !=1){
             params.put("page",String.valueOf(currPage));
         }
@@ -129,25 +141,33 @@ public class RecepiesList extends Activity {
                 pDialog.dismiss();
             }
                // list =  new ArrayList<Recipe>();
-                if(response.isSuccessful()){
+                if(response.isSuccessful()) {
 
-                    RecipeList recipeList = response.body();
-                    loaded = recipeList.getCount();
-                    for(Recipe rec : recipeList.getRecipes()) {
-                        listOfRecipes.add(rec);
+                    if (response.body().getCount() == 0){
+                        previousCallEmpty = true;
                     }
-                    mAdapter = new RecipesAdapter(listOfRecipes);
-                    mAdapter.notifyDataSetChanged();
-                    RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-                    layoutManagerRef = mLayoutManager;
-                    recyclerView.setLayoutManager(mLayoutManager);
-                    recyclerView.setItemAnimator(new DefaultItemAnimator());
-                    recyclerView.setAdapter(mAdapter);
-                    if(recyclerViewState != null) {
-                        recyclerView.getLayoutManager().onRestoreInstanceState(recyclerViewState);
+
+                    if (response.body().getCount() == 0 && currPage == 2) {
+                        Toast.makeText(getApplicationContext(), "Can't find recipe matching criteria :)", Toast.LENGTH_SHORT).show();
+                    } else {
+                        RecipeList recipeList = response.body();
+                        loaded = recipeList.getCount();
+                        for (Recipe rec : recipeList.getRecipes()) {
+                            listOfRecipes.add(rec);
+                        }
+                        mAdapter = new RecipesAdapter(listOfRecipes);
+                        mAdapter.notifyDataSetChanged();
+                        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+                        layoutManagerRef = mLayoutManager;
+                        recyclerView.setLayoutManager(mLayoutManager);
+                        recyclerView.setItemAnimator(new DefaultItemAnimator());
+                        recyclerView.setAdapter(mAdapter);
+                        if (recyclerViewState != null && currPage != 2) {
+                            recyclerView.getLayoutManager().onRestoreInstanceState(recyclerViewState);
+                        }
+                        loading = true;
+                        // mAdapter.notifyDataSetChanged();
                     }
-                    loading = true;
-                   // mAdapter.notifyDataSetChanged();
                 }
             }
 

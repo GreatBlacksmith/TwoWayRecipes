@@ -16,21 +16,25 @@
 
         <TextView
             android:id="@+id/text"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="#555555"
             android:singleLine="true"
+            android:padding="5dp"
+            android:textAlignment="center"
             android:textSize="18dp"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"
-            android:text="@string/ingredients_dropdown_placeholder" />
+            android:text="@string/ingredients_dropdown_placeholder"
+            android:background="@drawable/edittextstyle"/>
     </LinearLayout>
 
     <android.support.v7.widget.RecyclerView
         android:layout_below="@+id/checkbox_layout"
         android:id="@+id/recycler_list_view_checkbox"
         android:layout_width="match_parent"
-        android:layout_height="fill_parent" />
+        android:layout_height="fill_parent"
+        android:layout_marginTop="5dp"/>
 
 
 </RelativeLayout>

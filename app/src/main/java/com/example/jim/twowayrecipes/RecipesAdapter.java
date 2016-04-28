@@ -2,6 +2,7 @@ package com.example.jim.twowayrecipes;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -30,7 +31,9 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
         public MyViewHolder(View view) {
             super(view);
             context = itemView.getContext();
+            Typeface type = Typeface.createFromAsset(context.getAssets(), "fonts/Verdana.ttf");
             titleView = (TextView) view.findViewById(R.id.list_item_title);
+            titleView.setTypeface(type);
             imageView = (SimpleDraweeView) view.findViewById(R.id.list_item_image_view);
             view.setOnClickListener(this);
         }
