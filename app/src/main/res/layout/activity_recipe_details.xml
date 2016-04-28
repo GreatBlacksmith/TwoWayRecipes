@@ -100,7 +100,7 @@
             android:layout_weight="4"
             android:paddingTop="6dp">
 
-            <ImageButton
+            <Button
                 android:layout_width="0px"
                 android:layout_height="match_parent"
                 android:id="@+id/imageButton"
@@ -109,9 +109,12 @@
                 android:layout_marginTop="6dp"
                 android:layout_marginRight="6dp"
                 android:layout_marginBottom="6dp"
+                android:text="@string/about_author"
+                android:textColor="@color/textWhite"
+                android:textSize="20sp"
                 android:background="@drawable/green_button"/>
 
-            <ImageButton
+            <Button
                 android:layout_width="0px"
                 android:layout_height="match_parent"
                 android:id="@+id/imageButton2"
@@ -119,8 +122,12 @@
                 android:layout_marginTop="6dp"
                 android:layout_marginLeft="6dp"
                 android:layout_marginBottom="6dp"
+                android:text="@string/full_recipe"
+                android:textColor="@color/textWhite"
+                android:textSize="20sp"
                 android:layout_weight="1"
                 android:background="@drawable/green_button"/>
+
         </LinearLayout>
 
     </LinearLayout>

@@ -5,6 +5,9 @@
     <string name="title_activity_show_list">ShowListActivity</string>
     <string name="api_url">http://food2fork.com/api/</string>
     <string name="ingredients_dropdown_placeholder">Click to select ingredients</string>
+    <string name="about_author">About author</string>
+    <string name="full_recipe">Full recipe</string>
+    <string name="load_button">Load More</string>
     <string-array name="ingredients_array">
         <item>Chicken</item>
         <item>Potato</item>

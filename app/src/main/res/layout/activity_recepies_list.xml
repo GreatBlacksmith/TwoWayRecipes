@@ -22,12 +22,26 @@
             android:hint="@string/search_hint"
             android:inputType="text"/>
     </LinearLayout>
+    <LinearLayout
+        android:orientation="vertical"
+        android:id="@+id/recyclerview_holder"
+        android:layout_below="@+id/searchlayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
     <android.support.v7.widget.RecyclerView
-        android:layout_below="@+id/searchlayout"
-        android:id="@+id/recycler_list_view"
-        android:layout_width="match_parent"
-        android:layout_height="fill_parent" />
-
+            android:id="@+id/recycler_list_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:text="@string/load_button"
+            android:id="@+id/button"
+            android:textSize="22sp"
+            android:textColor="@color/textWhite"
+            android:background="@drawable/gray_box"
+            android:layout_below="@+id/recyclerview_holder"/>
 
 </RelativeLayout>

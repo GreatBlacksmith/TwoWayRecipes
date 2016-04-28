@@ -3,10 +3,10 @@ package com.example.jim.twowayrecipes;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.net.Uri;
-import android.os.AsyncTask;
+
 import android.os.Bundle;
 import android.app.Activity;
+import android.os.Parcelable;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,14 +18,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
-
-import com.facebook.drawee.backends.pipeline.Fresco;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -39,20 +31,25 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RecepiesList extends Activity {
 
-    private List<Recipe> list;
+    private List<Recipe> listOfRecipes;
     private RecyclerView recyclerView;
     private RecipesAdapter mAdapter;
     private EditText searchText;
     private String searchTherm;
+    private int currPage = 1;
     ProgressDialog pDialog;
     HashMap<String,String> params;
-
+    private int loaded = 0;
+    private boolean loading = true;
+    private Parcelable recyclerViewState = null;
+    int pastVisiblesItems, visibleItemCount, totalItemCount;
+    private RecyclerView.LayoutManager layoutManagerRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recepies_list);
-
+        listOfRecipes = new ArrayList<>();
         searchText = (EditText) findViewById(R.id.searchList);
         recyclerView = (RecyclerView) findViewById(R.id.recycler_list_view);
 
@@ -62,13 +59,39 @@ public class RecepiesList extends Activity {
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
                 hideKeyboard(textView);
                 searchTherm = searchText.getText().toString();
-                if(searchTherm != null){
-                    params.put("q",searchTherm);
+                if (searchTherm != null) {
+                    params.put("q", searchTherm);
                 }
                 doServerCall();
                 return true;
             }
         });
+      //  layoutManagerRef = recyclerView.getLayoutManager();
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                if (dy > 0) //check for scroll down
+                {
+                    visibleItemCount = layoutManagerRef.getChildCount();
+                    totalItemCount = layoutManagerRef.getItemCount();
+                    pastVisiblesItems = ((LinearLayoutManager) recyclerView.getLayoutManager()).findFirstVisibleItemPosition();
+
+                    if (loading) {
+                        if ((visibleItemCount + pastVisiblesItems) >= totalItemCount) {
+                            loading = false;
+
+                            recyclerViewState = recyclerView.getLayoutManager().onSaveInstanceState();
+                            doServerCall();
+
+                        }
+                    }
+                }
+            }
+        });
+
+
     }
     private void hideKeyboard(View view){
         InputMethodManager inputManager = (InputMethodManager)
@@ -94,6 +117,10 @@ public class RecepiesList extends Activity {
         if(searchTherm != null){
             params.put("q",searchTherm);
         }
+        if(currPage !=1){
+            params.put("page",String.valueOf(currPage));
+        }
+        currPage++;
         Call<RecipeList> call = recipeInterface.getRecipeList(params);
         call.enqueue(new Callback<RecipeList>() {
             @Override
@@ -101,19 +128,26 @@ public class RecepiesList extends Activity {
                 if (pDialog.isShowing()) {
                 pDialog.dismiss();
             }
-                list =  new ArrayList<Recipe>();
+               // list =  new ArrayList<Recipe>();
                 if(response.isSuccessful()){
+
                     RecipeList recipeList = response.body();
-                    for(Recipe rec : recipeList.getRecipes()){
-                        list.add(rec);
+                    loaded = recipeList.getCount();
+                    for(Recipe rec : recipeList.getRecipes()) {
+                        listOfRecipes.add(rec);
                     }
-                    mAdapter = new RecipesAdapter(list);
+                    mAdapter = new RecipesAdapter(listOfRecipes);
                     mAdapter.notifyDataSetChanged();
                     RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+                    layoutManagerRef = mLayoutManager;
                     recyclerView.setLayoutManager(mLayoutManager);
                     recyclerView.setItemAnimator(new DefaultItemAnimator());
                     recyclerView.setAdapter(mAdapter);
-                    mAdapter.notifyDataSetChanged();
+                    if(recyclerViewState != null) {
+                        recyclerView.getLayoutManager().onRestoreInstanceState(recyclerViewState);
+                    }
+                    loading = true;
+                   // mAdapter.notifyDataSetChanged();
                 }
             }
 
