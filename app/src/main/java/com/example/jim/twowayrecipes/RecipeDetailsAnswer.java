@@ -3,7 +3,7 @@ package com.example.jim.twowayrecipes;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-
+//holder object za server response
 
 public class RecipeDetailsAnswer {
 

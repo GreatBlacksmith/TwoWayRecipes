@@ -10,11 +10,9 @@ import android.os.Parcelable;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -52,11 +50,24 @@ public class RecepiesList extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recepies_list);
         listOfRecipes = new ArrayList<>();
-        searchText = (EditText) findViewById(R.id.searchList);;
+        searchText = (EditText) findViewById(R.id.searchList);
         searchTherm = searchText.getText().toString();
         recyclerView = (RecyclerView) findViewById(R.id.recycler_list_view);
 
         this.doServerCall();
+
+
+        // Ako je searchtext dobio focus, ukloni hint
+        searchText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    searchText.setHint("");
+                } else {
+                    searchText.setHint(getResources().getString(R.string.search_hint));
+                }
+            }
+        });
         searchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
@@ -71,7 +82,7 @@ public class RecepiesList extends Activity {
                 return true;
             }
         });
-      //  layoutManagerRef = recyclerView.getLayoutManager();
+        //ako je korisnik scrollao do kraja liste, zove ponovo servis i response dodaje u listu
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -107,10 +118,12 @@ public class RecepiesList extends Activity {
         inputManager.hideSoftInputFromWindow((null == getCurrentFocus()) ? null : getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
     }
 
+    //zove servis i dohvaca recepte prema odabranim parametrima
+
     private void doServerCall(){
 
         pDialog = new ProgressDialog(RecepiesList.this);
-            pDialog.setMessage("Loading recepies..");
+            pDialog.setMessage("Loading recipes..");
             pDialog.setCancelable(false);
             pDialog.show();
         Retrofit retrofit = new Retrofit.Builder()
@@ -119,12 +132,12 @@ public class RecepiesList extends Activity {
                 .build();
 
         RecipeDetailsInterface recipeInterface = retrofit.create(RecipeDetailsInterface.class);
-        params =  new LinkedHashMap<String,String>();
+        params =  new LinkedHashMap<>();
         params.put("key", getResources().getString(R.string.api_key));
         if(searchTherm != null){
             params.put("q",searchTherm);
         }
-        if(searchTherm != oldSearchTherm){
+        if(!searchTherm.equals(oldSearchTherm)){
             previousCallEmpty = false;
             oldSearchTherm = searchTherm;
             listOfRecipes = new ArrayList<>();

@@ -13,7 +13,7 @@
 
     <ImageButton
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="100dp"
         android:id="@+id/imageButtonSearch"
         android:background="@drawable/search"
         android:layout_above="@+id/imageButtonMake"
@@ -22,7 +22,7 @@
 
     <ImageButton
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="100dp"
         android:id="@+id/imageButtonMake"
         android:background="@drawable/make"
         android:contentDescription="MakeRecepie"

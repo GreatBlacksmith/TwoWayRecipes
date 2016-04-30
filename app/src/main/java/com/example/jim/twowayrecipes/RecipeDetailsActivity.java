@@ -1,13 +1,13 @@
 package com.example.jim.twowayrecipes;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,7 +22,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-
+//zove servis sa idom kliknutog recepta, te postavlja sve vrijednosti iz responsa u elemente na viewu
 public class RecipeDetailsActivity extends Activity {
 
     private TextView titleOnImage;
@@ -34,6 +34,7 @@ public class RecipeDetailsActivity extends Activity {
     private Button recipeButton;
     private String authorUrl;
     private String recipeUrl;
+    ProgressDialog pDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,9 +58,13 @@ public class RecipeDetailsActivity extends Activity {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
+        pDialog = new ProgressDialog(RecipeDetailsActivity.this);
+        pDialog.setMessage("Loading recipe..");
+        pDialog.setCancelable(false);
+        pDialog.show();
 
         RecipeDetailsInterface recipeInterface = retrofit.create(RecipeDetailsInterface.class);
-        HashMap<String,String> params = new LinkedHashMap<String,String>();
+        HashMap<String,String> params = new LinkedHashMap<>();
         params.put("key",getResources().getString(R.string.api_key));
         params.put("rId", recipeId);
         Call<RecipeDetailsAnswer> call = recipeInterface.getRecipeDetails(params);
@@ -67,24 +72,32 @@ public class RecipeDetailsActivity extends Activity {
             @Override
             public void onResponse(Call<RecipeDetailsAnswer> call, Response<RecipeDetailsAnswer> response) {
                 if(response.isSuccessful()){
+
                     RecipeDetailsAnswer recipeDetailsAnswer = response.body();
                     authorUrl = recipeDetailsAnswer.getRecipe().getPublisherUrl();
                     recipeUrl = recipeDetailsAnswer.getRecipe().getSourceUrl();
                     titleOnImage.setText(recipeDetailsAnswer.getRecipe().getTitle());
                     ingredients.append(" Ingredients: \n");
                     for( int i=0; i< recipeDetailsAnswer.getRecipe().getIngredients().size();i++){
-                        ingredients.append(" - " + recipeDetailsAnswer.getRecipe().getIngredients().get(i) + "\n");
+                        ingredients.append(" \u2022 " + recipeDetailsAnswer.getRecipe().getIngredients().get(i) + "\n");
                     }
                     scoreBar.setProgress(recipeDetailsAnswer.getRecipe().getSocialRank().intValue());
                     scoreBar.setFocusable(false);
                     authorTextView.setText(recipeDetailsAnswer.getRecipe().getPublisher());
                     Uri uri = Uri.parse(recipeDetailsAnswer.getRecipe().getImageUrl());
                     imageView.setImageURI(uri);
+
+                    if (pDialog.isShowing()) {
+                        pDialog.dismiss();
+                    }
                 }
             }
 
             @Override
             public void onFailure(Call<RecipeDetailsAnswer> call, Throwable t) {
+                if (pDialog.isShowing()) {
+                    pDialog.dismiss();
+                }
                 Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });

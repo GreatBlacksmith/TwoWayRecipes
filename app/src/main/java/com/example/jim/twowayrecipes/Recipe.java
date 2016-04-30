@@ -1,8 +1,7 @@
 package com.example.jim.twowayrecipes;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
-
+//holder object za server response
 public class Recipe {
 
     private String title;

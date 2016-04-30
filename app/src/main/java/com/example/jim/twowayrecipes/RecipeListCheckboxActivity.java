@@ -9,14 +9,10 @@ import android.os.Parcelable;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.facebook.drawee.backends.pipeline.Fresco;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,7 +26,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RecipeListCheckboxActivity extends Activity {
-    List<CharSequence> list = new ArrayList<CharSequence>();
+    List<CharSequence> list = new ArrayList<>();
     String[] ingredients;
     private List<Recipe> listRecipe;
     private RecyclerView recyclerView;
@@ -56,7 +52,7 @@ public class RecipeListCheckboxActivity extends Activity {
             list.add(ingredients[i]);
         }
         currPage = 1;
-        View openDialog = (View) findViewById(R.id.checkbox_layout);
+        View openDialog = findViewById(R.id.checkbox_layout);
         openDialog.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -148,11 +144,12 @@ public class RecipeListCheckboxActivity extends Activity {
                 }
             }
         });
+        openDialog.callOnClick();
     }
     private void doServerCall(){
 
         pDialog = new ProgressDialog(RecipeListCheckboxActivity.this);
-        pDialog.setMessage("Loading recepies..");
+        pDialog.setMessage("Loading recipes..");
         pDialog.setCancelable(false);
         pDialog.show();
         Retrofit retrofit = new Retrofit.Builder()
@@ -161,7 +158,7 @@ public class RecipeListCheckboxActivity extends Activity {
                 .build();
 
         RecipeDetailsInterface recipeInterface = retrofit.create(RecipeDetailsInterface.class);
-        params =  new LinkedHashMap<String,String>();
+        params =  new LinkedHashMap<>();
         params.put("key", getResources().getString(R.string.api_key));
         if(stringBuilder != null){
             params.put("q",stringBuilder.toString());
